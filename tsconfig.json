@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2022",   
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,                        
+    "module": "commonjs",                        
+    "outDir": "./dist",                          
+    "lib": ["es2022"],                         
+    "declaration": true,                         
+    "sourceMap": true,                          
+    "strict": true,                             
+    "esModuleInterop": true,                    
+    "moduleResolution": "node",                  
+    "skipLibCheck": true,                        
+    "forceConsistentCasingInFileNames": true,    
+    "baseUrl": ".",                              
+    "paths": {
+      "@color-utils/*": ["src/*"]              
+    }
+  },
+  "include": ["src/**/*"],                       
+  "exclude": ["node_modules"] 
+}
