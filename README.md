@@ -43,7 +43,7 @@ You can import the ColorUtils class from the library as follows:
 
 Finds a specified number of distinct colors from a list based on a similarity threshold.
 
-Parameters:
+**Parameters:**
 
 `hexColors` (string[]): The list of hex color strings (e.g., `['#ff0000', '#00ff00']`).
 `numColors` (number): The number of distinct colors to retrieve.
@@ -60,4 +60,121 @@ const threshold = 20;
 
 const distinctColors = ColorUtils.getDistinctColors(colors, numColorsToRetrieve, threshold);
 console.log(distinctColors); // Output: ['#ff0000', '#00ff00']
+```
+`labToHex`
+
+Converts a LAB color to a hex color string.
+
+**Parameters:**
+
+`lab` (LabColor): The LAB color object.
+
+**Returns:**
+
+(string): The hex color string.
+
+**Example:**
+
+```typescript
+const lab = { L: 53.23288, a: 80.10933, b: 67.22006 };
+const hex = ColorUtils.labToHex(lab);
+console.log(hex); // Output: '#ff0000'
+```
+
+`hexToLab`
+
+Converts a hex color to a LAB color object.
+
+**Parameters:**
+
+`hex` (string): The hex color string (e.g., '#ff0000').
+
+**Returns:**
+
+(LabColor): The LAB color object.
+
+**Example:**
+
+```typescript
+const hex = '#ff0000';
+const lab = ColorUtils.hexToLab(hex);
+console.log(lab); // Output: { L: 53.23288, a: 80.10933, b: 67.22006 }
+```
+
+`rgbToHex`
+
+Converts an RGB color to a hex color string.
+
+**Parameters:**
+
+`rgb` (RGBColor): The RGB color object.
+
+**Returns:**
+
+(string): The hex color string.
+
+**Example:**
+
+```typescript
+const rgb = { R: 255, G: 0, B: 0 };
+const hex = ColorUtils.rgbToHex(rgb);
+console.log(hex); // Output: '#ff0000'
+```
+
+`hexToRgb`
+
+Converts a hex color to an RGB color object.
+
+**Parameters:**
+
+`hex` (string): The hex color string (e.g., '#ff0000').
+
+**Returns:**
+
+(RGBColor): The RGB color object.
+**Example:**
+
+```typescript
+const hex = '#ff0000';
+const rgb = ColorUtils.hexToRgb(hex);
+console.log(rgb); // Output: { R: 255, G: 0, B: 0 }
+```
+
+`generateColorPalette`
+
+Generates a color palette based on a given hex color and the desired number of colors.
+
+**Parameters:**
+
+`hex` (string): The hex color string (e.g., '#ff0000').
+numColors (number): The number of colors in the palette.
+
+**Returns:**
+
+(string[]): The array of hex color strings in the palette.
+
+**Example:**
+
+```typescript
+const palette = ColorUtils.generateColorPalette('#ff0000', 5);
+console.log(palette); // Output: ['#ff0000', '#ff3333', '#ff6666', '#ff9999', '#ffcccc']
+```
+
+`getComplementaryColor`
+
+Generates a complementary color for a given hex color.
+
+**Parameters:**
+
+`hex` (string): The hex color string (e.g., '#ff0000').
+
+**Returns:**
+
+(string): The complementary hex color string.
+
+**Example:**
+
+```typescript
+const complementaryColor = ColorUtils.getComplementaryColor('#ff0000');
+console.log(complementaryColor); // Output: '#00ffff'
 ```
