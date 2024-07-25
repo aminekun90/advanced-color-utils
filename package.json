@@ -1,6 +1,6 @@
 {
   "name": "advanced-color-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Unleash the full potential of color manipulation with the ColorUtils library! Designed for developers who need precise control over color processing",
   "main": "dist/ColorUtils.js",
   "types": "dist/ColorUtils.d.ts",
@@ -21,7 +21,7 @@
     "color-diff": "^1.4.0",
     "tslog": "^4.9.3"
   },
-  "devDependencies": {  
+  "devDependencies": {
     "typescript": "^5.5.4",
     "ts-node": "^10.9.2",
     "@types/node": "^20.14.12",
@@ -33,5 +33,28 @@
     "ts-jest": "^29.2.3",
     "ts-loader": "^9.4.2",
     "tsconfig-paths": "^4.2.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aminekun90/advanced-color-utils.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "color",
+    "library",
+    "chroma",
+    "chroma-js",
+    "manipulation",
+    "color-utils",
+    "color-diff"
+  ],
+  "bugs": {
+    "url": "https://github.com/aminekun90/advanced-color-utils/issues"
+  },
+  "homepage": "https://github.com/aminekun90/advanced-color-utils#readme"
 }
