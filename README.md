@@ -39,19 +39,22 @@ You can import the ColorUtils class from the library as follows:
  ```
 
 ### Methods
+
 `getDistinctColors`
 
 Finds a specified number of distinct colors from a list based on a similarity threshold.
 
-**Parameters:**
+**- Parameters:**
 
 `hexColors` (string[]): The list of hex color strings (e.g., `['#ff0000', '#00ff00']`).
 `numColors` (number): The number of distinct colors to retrieve.
 `threshold` (number): The threshold for color similarity (lower values mean more similar).
-Returns:
+
+**- Returns:**
 
 (string[]): The list of distinct hex color strings.
-Example:
+
+**- Example:**
 
 ```typescript
 const colors = ['#ff0000', '#00ff00', '#0000ff', '#ff00ff'];
@@ -65,15 +68,15 @@ console.log(distinctColors); // Output: ['#ff0000', '#00ff00']
 
 Converts a LAB color to a hex color string.
 
-**Parameters:**
+**- Parameters:**
 
 `lab` (LabColor): The LAB color object.
 
-**Returns:**
+**- Returns:**
 
 (string): The hex color string.
 
-**Example:**
+**- Example:**
 
 ```typescript
 const lab = { L: 53.23288, a: 80.10933, b: 67.22006 };
@@ -85,15 +88,15 @@ console.log(hex); // Output: '#ff0000'
 
 Converts a hex color to a LAB color object.
 
-**Parameters:**
+**- Parameters:**
 
 `hex` (string): The hex color string (e.g., '#ff0000').
 
-**Returns:**
+**- Returns:**
 
 (LabColor): The LAB color object.
 
-**Example:**
+**- Example:**
 
 ```typescript
 const hex = '#ff0000';
@@ -105,15 +108,15 @@ console.log(lab); // Output: { L: 53.23288, a: 80.10933, b: 67.22006 }
 
 Converts an RGB color to a hex color string.
 
-**Parameters:**
+**- Parameters:**
 
 `rgb` (RGBColor): The RGB color object.
 
-**Returns:**
+**- Returns:**
 
 (string): The hex color string.
 
-**Example:**
+**- Example:**
 
 ```typescript
 const rgb = { R: 255, G: 0, B: 0 };
@@ -125,14 +128,14 @@ console.log(hex); // Output: '#ff0000'
 
 Converts a hex color to an RGB color object.
 
-**Parameters:**
+**- Parameters:**
 
 `hex` (string): The hex color string (e.g., '#ff0000').
 
-**Returns:**
+**- Returns:**
 
 (RGBColor): The RGB color object.
-**Example:**
+**- Example:**
 
 ```typescript
 const hex = '#ff0000';
@@ -144,16 +147,16 @@ console.log(rgb); // Output: { R: 255, G: 0, B: 0 }
 
 Generates a color palette based on a given hex color and the desired number of colors.
 
-**Parameters:**
+**- Parameters:**
 
 `hex` (string): The hex color string (e.g., '#ff0000').
 numColors (number): The number of colors in the palette.
 
-**Returns:**
+**- Returns:**
 
 (string[]): The array of hex color strings in the palette.
 
-**Example:**
+**- Example:**
 
 ```typescript
 const palette = ColorUtils.generateColorPalette('#ff0000', 5);
@@ -164,17 +167,162 @@ console.log(palette); // Output: ['#ff0000', '#ff3333', '#ff6666', '#ff9999', '#
 
 Generates a complementary color for a given hex color.
 
-**Parameters:**
+**- Parameters:**
 
 `hex` (string): The hex color string (e.g., '#ff0000').
 
-**Returns:**
+**- Returns:**
 
 (string): The complementary hex color string.
 
-**Example:**
+**- Example:**
 
 ```typescript
 const complementaryColor = ColorUtils.getComplementaryColor('#ff0000');
 console.log(complementaryColor); // Output: '#00ffff'
 ```
+
+`generateShades`
+
+Generates a list of shades from a base color.
+
+**- Parameters:**
+
+`hex` (string): The base hex color string (e.g., '#ff0000').
+`numShades` (number): The number of shades to generate.
+
+**- Returns:**
+
+(string[]) An array of hex color strings representing the shades.
+
+**- Example:**
+
+```typescript
+const shades = ColorUtils.generateShades('#ff0000', 5);
+console.log(shades); // Output: ['#ff0000', '#bb1909', '#7a1b0c', '#3f1508', '#000000']
+```
+
+`generateTints`
+
+Generates a list of tints from a base color.
+
+**- Parameters:**
+
+`hex` (string): The base hex color string (e.g., '#ff0000').
+`numTints` (number): The number of tints to generate.
+
+**- Returns:**
+
+(string[]) An array of hex color strings representing the tints.
+
+**- Example:**
+
+```typescript
+const tints = ColorUtils.generateTints('#ff0000', 5);
+console.log(tints); // Output: ['#ff0000', '#ff4040', '#ff8080', '#ffbfbf', '#ffffff']
+```
+
+`blendColors`
+
+Blends two hex colors together.
+
+**- Parameters:**
+
+`color1` (string): The first hex color string.
+`color2` (string): The second hex color string.
+`ratio` (number): The ratio of blending (0 to 1). 0 means full color1, 1 means full color2.
+`colorSpace` (InterpolationMode): The color space to use for blending (default is 'lab'). Possible values are `"rgb" | "hsl" | "hsv" | "hsi" | "lab" | "oklab" | "lch" | "oklch" | "hcl" | "lrgb"`
+
+**- Returns:**
+
+(string) The blended hex color string.
+
+Example:
+```typescript
+const blendedColor = ColorUtils.blendColors('#ff0000', '#0000ff', 0.5, 'lab');
+console.log(blendedColor); // Output: '#b400b4'
+```
+
+`hexToHsl`
+
+Converts a hex color string to an HSL object.
+
+**- Parameters:**
+
+`hex` (string): The hex color string (e.g., '#ff0000').
+
+**- Returns:** 
+
+(HSLColor) The HSL color object.
+
+**- Example:**
+
+```typescript
+const hsl = ColorUtils.hexToHsl('#ff0000');
+console.log(hsl); // Output: { h: 0, s: 100, l: 50 }
+
+```
+
+`getContrastRatio`
+
+Calculates the contrast ratio between two hex colors.
+
+**- Parameters:**
+
+`color1` (string): The first hex color string.
+`color2` (string): The second hex color string.
+
+**- Returns:**
+
+ (number) The contrast ratio.
+
+**- Example:**
+
+```typescript
+const ratio = ColorUtils.getContrastRatio('#ff0000', '#0000ff');
+console.log(ratio); // Output: 4.5
+
+```
+`generateRandomColor`
+
+Generates a random hex color.
+
+**- Returns:** 
+(string) The random hex color string.
+
+**- Example:**
+
+```typescript
+const randomColor = ColorUtils.generateRandomColor();
+console.log(randomColor); // Output: e.g., '#a1b2c3'
+```
+
+`generateAnalogousColors`
+
+Generates a list of analogous colors based on a base color.
+
+Parameters:
+
+`hex` (string): The base hex color string (e.g., '#ff0000').
+`numColors` (number): The number of analogous colors to generate.
+
+**- Returns:**
+
+(string[]) An array of hex color strings representing the analogous colors.
+
+**- Example:**
+
+```typescript
+const analogousColors = ColorUtils.generateAnalogousColors('#ff0000', 5);
+console.log(analogousColors); // Output: ['#ff0000', '#ff3333', '#ff6666', '#ff9999', '#ffcccc']
+```
+
+## License
+
+This library is licensed under the [MIT License](https://github.com/aminekun90/advanced-color-utils?tab=MIT-1-ov-file#readme).
+
+Feel free to contribute or report issues via the [GitHub repository](https://github.com/aminekun90/advanced-color-utils).
+
+
+## Support me :coffee:
+[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/aminebouzahar)

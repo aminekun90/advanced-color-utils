@@ -1,4 +1,4 @@
-import chroma from "chroma-js";
+import chroma, { InterpolationMode } from "chroma-js";
 import { diff, LabColor, RGBColor } from "color-diff";
 import { LogPerf } from "@color-utils/decorators/LogPerf";
 
@@ -91,5 +91,102 @@ export class ColorUtils {
         }
 
         return distinctColors;
+    }
+
+    /**
+     * Generate shades of a given hex color.
+     * @param {string} hex - The hex color string.
+     * @param {number} numShades - The number of shades to generate.
+     * @returns {string[]} The array of hex color strings representing the shades.
+     */
+    public static generateShades(hex: string, numShades: number): string[] {
+        if (numShades <= 0) return [];
+
+        const color = chroma(hex);
+        // Create a scale from the original color to black
+        const scale = chroma.scale([color, '#000000']).mode('lab').colors(numShades);
+
+        return scale;
+    }
+
+    /**
+     * Generate tints of a given hex color.
+     * @param {string} hex - The hex color string.
+     * @param {number} numTints - The number of tints to generate.
+     * @returns {string[]} The array of hex color strings representing the tints.
+     */
+    public static generateTints(hex: string, numTints: number): string[] {
+        if (numTints <= 0) return [];
+
+        const color = chroma(hex);
+        // Create a scale from the original color to white
+        const scale = chroma.scale([color, '#ffffff']).mode('lab').colors(numTints);
+
+        return scale;
+    }
+
+     /**
+     * Blend two hex colors together.
+     * @param {string} color1 - The first hex color string.
+     * @param {string} color2 - The second hex color string.
+     * @param {number} ratio - The ratio of blending (0 to 1). 0 means full color1, 1 means full color2.
+     * @param {InterpolationMode} [colorSpace='lab'] - The color space to use for blending (default is 'lab').
+     * @returns {string} The blended hex color string.
+     */
+     public static blendColors(color1: string, color2: string, ratio: number, colorSpace: InterpolationMode = 'lab'): string {
+         // Ensure ratio is between 0 and 1
+         ratio = Math.max(0, Math.min(1, ratio));
+         // Use chroma to blend the two colors in the specified color space
+         return chroma.mix(color1, color2, ratio, colorSpace).hex();
+    }
+
+    /**
+     * Convert a hex color to an HSL color object.
+     * @param {string} hex - The hex color string.
+     * @returns {object} The HSL color object.
+     */
+    public static hexToHsl(hex: string): { H: number, S: number, L: number } {
+        const [h, s, l] = chroma(hex).hsl();
+        return { H: h, S: s, L: l };
+    }
+
+    /**
+     * Calculate the contrast ratio between two colors.
+     * @param {string} color1 - The first hex color string.
+     * @param {string} color2 - The second hex color string.
+     * @returns {number} The contrast ratio.
+     */
+    public static getContrastRatio(color1: string, color2: string): number {
+        return chroma.contrast(color1, color2);
+    }
+
+    /**
+     * Generate a random hex color string.
+     * @returns {string} The random hex color string.
+     */
+    public static generateRandomColor(): string {
+        return chroma.random().hex();
+    }
+
+    /**
+     * Generate analogous colors for a given hex color.
+     * @param {string} hex - The hex color string.
+     * @param {number} numColors - The number of analogous colors to generate.
+     * @returns {string[]} The array of hex color strings representing the analogous colors.
+     */
+    public static generateAnalogousColors(hex: string, numColors: number): string[] {
+        const angle = 30; // Angle difference for analogous colors
+        const baseHue = chroma(hex).get('hsl.h');
+        const analogousColors = [];
+
+        for (let i = 1; i <= numColors; i++) {
+            const hueOffset = angle * i;
+            const color1 = chroma(hex).set('hsl.h', (baseHue + hueOffset) % 360).hex();
+            const color2 = chroma(hex).set('hsl.h', (baseHue - hueOffset + 360) % 360).hex();
+            analogousColors.push(color1, color2);
+        }
+
+        // Slice the array to the required number of colors
+        return analogousColors.slice(0, numColors);
     }
 }
