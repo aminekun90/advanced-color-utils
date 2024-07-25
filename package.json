@@ -1,6 +1,6 @@
 {
   "name": "@aminekun90/advanced-color-utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Unleash the full potential of color manipulation with the ColorUtils library! Designed for developers who need precise control over color processing",
   "main": "dist/ColorUtils.js",
   "types": "dist/ColorUtils.d.ts",
