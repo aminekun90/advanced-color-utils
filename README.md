@@ -47,7 +47,9 @@ Finds a specified number of distinct colors from a list based on a similarity th
 **- Parameters:**
 
 `hexColors` (string[]): The list of hex color strings (e.g., `['#ff0000', '#00ff00']`).
+
 `numColors` (number): The number of distinct colors to retrieve.
+
 `threshold` (number): The threshold for color similarity (lower values mean more similar).
 
 **- Returns:**
@@ -189,6 +191,7 @@ Generates a list of shades from a base color.
 **- Parameters:**
 
 `hex` (string): The base hex color string (e.g., '#ff0000').
+
 `numShades` (number): The number of shades to generate.
 
 **- Returns:**
@@ -209,6 +212,7 @@ Generates a list of tints from a base color.
 **- Parameters:**
 
 `hex` (string): The base hex color string (e.g., '#ff0000').
+
 `numTints` (number): The number of tints to generate.
 
 **- Returns:**
@@ -229,9 +233,14 @@ Blends two hex colors together.
 **- Parameters:**
 
 `color1` (string): The first hex color string.
+
 `color2` (string): The second hex color string.
+
 `ratio` (number): The ratio of blending (0 to 1). 0 means full color1, 1 means full color2.
-`colorSpace` (InterpolationMode): The color space to use for blending (default is 'lab'). Possible values are `"rgb" | "hsl" | "hsv" | "hsi" | "lab" | "oklab" | "lch" | "oklch" | "hcl" | "lrgb"`
+
+`colorSpace` (InterpolationMode): The color space to use for blending (default is 'lab'). 
+
+Possible values for `colorSpace` are `"rgb" | "hsl" | "hsv" | "hsi" | "lab" | "oklab" | "lch" | "oklch" | "hcl" | "lrgb"`
 
 **- Returns:**
 
@@ -270,6 +279,7 @@ Calculates the contrast ratio between two hex colors.
 **- Parameters:**
 
 `color1` (string): The first hex color string.
+
 `color2` (string): The second hex color string.
 
 **- Returns:**
