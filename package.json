@@ -1,5 +1,5 @@
 {
-  "name": "advanced-color-utils",
+  "name": "@aminekun90/advanced-color-utils",
   "version": "1.0.1",
   "description": "Unleash the full potential of color manipulation with the ColorUtils library! Designed for developers who need precise control over color processing",
   "main": "dist/ColorUtils.js",
@@ -8,6 +8,7 @@
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "test": "jest --no-cache --runInBand",
     "test:cov": "jest --coverage --no-cache --runInBand",
+    "addscope": "node tools/packagejson name @aminekun90/advanced-color-utils",
     "build": "tsc"
   },
   "author": "aminekun90",
