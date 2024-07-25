@@ -1,8 +1,8 @@
 # Advanced ColorUtils Library
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/aminekun90/color-utils/graphs/commit-activity) [![version number](https://img.shields.io/npm/v/mdns-listener-advanced?color=green&label=version)](https://github.com/aminekun90/color-utils/releases) [![Actions Status](https://github.com/aminekun90/color-utils/workflows/Test/badge.svg)](https://github.com/aminekun90/color-utils/actions) [![License](https://img.shields.io/github/license/aminekun90/color-utils)](https://github.com/aminekun90/color-utils/blob/master/LICENSE)
-![node-current](https://img.shields.io/node/v/mdns-listener-advanced)
-[![Socket Badge](https://socket.dev/api/badge/npm/package/mdns-listener-advanced)](https://socket.dev/npm/package/mdns-listener-advanced)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/aminekun90/advanced-color-utils/graphs/commit-activity) [![version number](https://img.shields.io/npm/v/advanced-color-utils?color=green&label=version)](https://github.com/aminekun90/advanced-color-utils/releases) [![Actions Status](https://github.com/aminekun90/advanced-color-utils/workflows/Test/badge.svg)](https://github.com/aminekun90/advanced-color-utils/actions) [![License](https://img.shields.io/github/license/aminekun90/color-utils)](https://github.com/aminekun90/advanced-color-utils/blob/master/LICENSE)
+![node-current](https://img.shields.io/node/v/advanced-color-utils)
+[![Socket Badge](https://socket.dev/api/badge/npm/package/advanced-color-utils)](https://socket.dev/npm/package/advanced-color-utils)
 
 A TypeScript library for working with colors, providing functionality to find distinct colors from a list based on a similarity threshold.
 
@@ -27,7 +27,7 @@ Unleash the full potential of color manipulation with the ColorUtils library! De
 Install the library using npm:
 
 ```sh
-npm install color-utils
+npm install advanced-color-utils
 ```
 ## Usage
 ### Importing the Library
