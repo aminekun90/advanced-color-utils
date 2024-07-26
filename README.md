@@ -314,6 +314,7 @@ Generates a list of analogous colors based on a base color.
 Parameters:
 
 `hex` (string): The base hex color string (e.g., '#ff0000').
+
 `numColors` (number): The number of analogous colors to generate.
 
 **- Returns:**
