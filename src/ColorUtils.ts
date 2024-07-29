@@ -1,7 +1,7 @@
 import chroma, { InterpolationMode } from "chroma-js";
 import { diff, LabColor, RGBColor } from "color-diff";
-import { LogPerf } from "@color-utils/decorators/LogPerf";
-import { HSLColor } from "@color-utils/types";
+import { LogPerf } from "./decorators/LogPerf";
+import { HSLColor } from "./types";
 
 export class ColorUtils {
 
