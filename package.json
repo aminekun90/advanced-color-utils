@@ -1,6 +1,6 @@
 {
   "name": "advanced-color-utils",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Unleash the full potential of color manipulation with the ColorUtils library! Designed for developers who need precise control over color processing",
   "main": "dist/ColorUtils.js",
   "types": "dist/ColorUtils.d.ts",
@@ -23,17 +23,17 @@
     "tslog": "^4.9.3"
   },
   "devDependencies": {
-    "typescript": "^5.5.4",
-    "ts-node": "^10.9.2",
-    "@types/node": "^20.14.12",
     "@types/chroma-js": "^2.4.4",
     "@types/color-diff": "^1.2.5",
     "@types/jest": "^29.5.12",
+    "@types/node": "^22.0.0",
     "jest": "^29.7.0",
     "prettier": "^3.1.0",
     "ts-jest": "^29.2.3",
     "ts-loader": "^9.4.2",
-    "tsconfig-paths": "^4.2.0"
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.5.4"
   },
   "publishConfig": {
     "access": "public"
