@@ -230,6 +230,7 @@ export class ColorUtils {
 
     /**
      * Generate a monochromatic color scheme based on a given hex color.
+     * Function not working at the moment some cases are returning NaN values
      * @param {string} hex - The hex color string.
      * @param {number} numColors - The number of monochromatic colors to generate.
      * @returns {string[]} An array of hex color strings representing the monochromatic color scheme.
