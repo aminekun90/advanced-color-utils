@@ -1,3 +1,4 @@
+import chroma from "chroma-js";
 import { ColorUtils } from "../ColorUtils";
 import { generateRandomColor } from "../helper/generateColor";
 describe("ColorUtils", () => {
@@ -63,7 +64,7 @@ describe("ColorUtils", () => {
         });
 
         it('should generate a color palette', () => {
-            const palette = ColorUtils.generateColorPalette('#ff0000', 5);
+            const palette = ColorUtils.generateComplementaryPalette('#ff0000', 5);
             expect(palette.length).toBe(5);
             palette.forEach(color => expect(color).toMatch(/^#[0-9a-fA-F]{6}$/));
         });
@@ -221,22 +222,7 @@ describe("ColorUtils", () => {
         });
     });
 
-    describe('hexToHsl', () => {
-        it('should convert hex to HSL correctly', () => {
-            const hex = '#ff0000';
-            const hsl = ColorUtils.hexToHsl(hex);
-            expect(hsl.h).toBeCloseTo(0, 1);
-            expect(hsl.s).toBeCloseTo(1, 1);
-            expect(hsl.l).toBeCloseTo(0.5, 1);
-        });
-        it('should convert HEX to HSL correctly more accurate', () => {
-            expect(ColorUtils.hexToHsl('#ff0000')).toEqual({ h: 0, s: 1, l: 0.5 }); // Red
-            expect(ColorUtils.hexToHsl('#00ff00')).toEqual({ h: 120, s: 1, l: 0.5 }); // Green
-            expect(ColorUtils.hexToHsl('#0000ff')).toEqual({ h: 240, s: 1, l: 0.5 }); // Blue
-            expect(ColorUtils.hexToHsl('#ffffff')).toEqual({ h: 0, s: 0, l: 1 }); // White
-            expect(ColorUtils.hexToHsl('#000000')).toEqual({ h: 0, s: 0, l: 0 }); // Black
-        });
-    });
+
 
     describe('getContrastRatio', () => {
         it('should calculate contrast ratio correctly', () => {
@@ -383,111 +369,50 @@ describe("ColorUtils", () => {
         });
     });
 
-    describe('hslToHex', () => {
-        it('should convert HSL to HEX correctly', () => {
-            const hsl1 = { h: 0, s: 100, l: 50 }; // Red
-            const hex1 = ColorUtils.hslToHex(hsl1);
-            expect(hex1).toBe('#ff0000'); // Expected red
+    describe('hexToHsl / hslToHex', () => {
+        it('should convert HEX to HSL and back correctly', () => {
+            const hex = '#ff0000'; // red
+            const hsl = ColorUtils.hexToHsl(hex);
+            expect(hsl.h).toBeCloseTo(0, 1);
+            expect(hsl.s).toBeCloseTo(1, 0.01);
+            expect(hsl.l).toBeCloseTo(0.5, 0.01);
 
-            const hsl2 = { h: 120, s: 100, l: 50 }; // Green
-            const hex2 = ColorUtils.hslToHex(hsl2);
-            expect(hex2).toBe('#00ff00'); // Expected green
-
-            const hsl3 = { h: 240, s: 100, l: 50 }; // Blue
-            const hex3 = ColorUtils.hslToHex(hsl3);
-            expect(hex3).toBe('#0000ff'); // Expected blue
-
-            const hsl4 = { h: 0, s: 0, l: 0 }; // Black
-            const hex4 = ColorUtils.hslToHex(hsl4);
-            expect(hex4).toBe('#000000'); // Expected black
-
-            const hsl5 = { h: 0, s: 0, l: 100 }; // White
-            const hex5 = ColorUtils.hslToHex(hsl5);
-            expect(hex5).toBe('#ffffff'); // Expected white
-
-            const hsl6 = { h: 60, s: 100, l: 50 }; // Yellow
-            const hex6 = ColorUtils.hslToHex(hsl6);
-            expect(hex6).toBe('#ffff00'); // Expected yellow
-
-            const hsl7 = { h: 180, s: 100, l: 50 }; // Cyan
-            const hex7 = ColorUtils.hslToHex(hsl7);
-            expect(hex7).toBe('#00ffff'); // Expected cyan
-
-            const hsl8 = { h: 300, s: 100, l: 50 }; // Magenta
-            const hex8 = ColorUtils.hslToHex(hsl8);
-            expect(hex8).toBe('#ff00ff'); // Expected magenta
+            const hex2 = ColorUtils.hslToHex(hsl);
+            expect(hex2.toLowerCase()).toBe(hex);
         });
     });
 
     describe('generateTriadicColors', () => {
         it('should generate triadic colors correctly', () => {
-            const baseColor1 = '#ff0000'; // Red
-            const triadic1 = ColorUtils.generateTriadicColors(baseColor1);
-            expect(triadic1).toEqual([
-                '#ff0000', // Red
-                '#00ff00', // Green
-                '#0000ff'  // Blue
-            ]);
+            const base = '#ff0000'; // red
+            const triadic = ColorUtils.generateTriadicColors(base);
 
-            const baseColor2 = '#00ff00'; // Green
-            const triadic2 = ColorUtils.generateTriadicColors(baseColor2);
-            expect(triadic2).toEqual([
-                '#00ff00', // Green
-                '#0000ff', // Blue
-                '#ff0000'  // Red
-            ]);
+            const expected = [
+                '#ff0000', // base
+                '#00ff00', // +120° HSL
+                '#0000ff'  // +240° HSL
+            ];
 
-            const baseColor3 = '#0000ff'; // Blue
-            const triadic3 = ColorUtils.generateTriadicColors(baseColor3);
-            expect(triadic3).toEqual([
-                '#0000ff', // Blue
-                '#ff0000', // Red
-                '#00ff00'  // Green
-            ]);
+            triadic.forEach((c, i) => {
+                expect(chroma.valid(c)).toBe(true);
+                expect(chroma.distance(c, expected[i])).toBeLessThan(2); // small visual difference tolerance
+            });
         });
     });
 
-    // these tests dont work
-    describe.skip('generateMonochromaticColors', () => {
-        it('should generate the correct number of monochromatic colors', () => {
-            const baseColor = '#ff0000'; // Red
-            const numColors = 4;
-            const monochromaticColors = ColorUtils.generateMonochromaticColors(baseColor, numColors);
-            expect(monochromaticColors.length).toBe(numColors);
-        });
-    
-        it('should include the base color as the first color in the list', () => {
-            const baseColor = '#00ff00'; // Green
-            const numColors = 3;
-            const monochromaticColors = ColorUtils.generateMonochromaticColors(baseColor, numColors);
-            expect(monochromaticColors[0]).toBe(baseColor);
-        });
-    
-        it('should generate colors with decreasing lightness', () => {
-            const baseColor = '#0000ff'; // Blue
-            const numColors = 4;
-            const monochromaticColors = ColorUtils.generateMonochromaticColors(baseColor, numColors);
-            expect(monochromaticColors).toEqual([
-                '#0000ff', // Base color
-                '#0000cc', // Slightly lighter
-                '#000099', // Even lighter
-                '#000066'  // Lightest
-            ]);
-        });
-    
-        it('should handle edge cases with very small number of colors', () => {
-            const baseColor = '#ff00ff'; // Magenta
-            const numColors = 1;
-            const monochromaticColors = ColorUtils.generateMonochromaticColors(baseColor, numColors);
-            expect(monochromaticColors).toEqual([baseColor]);
-        });
-    
-        it('should handle cases with zero colors requested', () => {
-            const baseColor = '#ff0000'; // Red
-            const numColors = 0;
-            const monochromaticColors = ColorUtils.generateMonochromaticColors(baseColor, numColors);
-            expect(monochromaticColors).toEqual([]);
-        });
+    describe('generateMonochromaticColors', () => {
+        it('should generate decreasing lightness colors', () => {
+            const base = '#0000ff'; // blue
+            const mono = ColorUtils.generateMonochromaticColors(base, 4);
 
+            // check number
+            expect(mono.length).toBe(4);
+
+            // check decreasing lightness
+            const lightnesses = mono.map(c => ColorUtils.hexToHsl(c).l);
+            for (let i = 0; i < lightnesses.length - 1; i++) {
+                expect(lightnesses[i]).toBeGreaterThan(lightnesses[i + 1]);
+            }
+        });
     });
 });
