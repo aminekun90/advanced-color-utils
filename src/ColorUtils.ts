@@ -1,4 +1,4 @@
-import chroma, { InterpolationMode } from "chroma-js";
+import chroma from "chroma-js";
 import { diff, LabColor, RGBColor } from "color-diff";
 import { LogPerf } from "./decorators/LogPerf";
 import { HSLColor } from "./types";
@@ -21,7 +21,7 @@ export class ColorUtils {
     * @param {number} numColors - The number of colors in the palette.
     * @returns {string[]} The array of hex color strings in the palette.
     */
-    public static generateColorPalette(hex: string, numColors: number): string[] {
+    public static generateComplementaryPalette(hex: string, numColors: number): string[] {
         return chroma.scale([hex, chroma(hex).set('hsl.h', (chroma(hex).get('hsl.h') + 180) % 360)])
             .mode('lab')
             .colors(numColors);
@@ -65,45 +65,7 @@ export class ColorUtils {
         return { L, a, b };
     }
 
-    /**
-     * Convert an HSL color to a hex color string.
-     * @param {HSLColor} hsl - The HSL color object.
-     * @returns {string} The hex color string.
-     */
-    public static hslToHex(hsl: HSLColor): string {
-        const { h, s, l } = hsl;
-        const _h = h / 360;
-        const _s = s / 100;
-        const _l = l / 100;
 
-        let r: number, g: number, b: number;
-
-        if (_s === 0) {
-            r = g = b = _l; // achromatic
-        } else {
-            const hue2rgb = (p: number, q: number, t: number): number => {
-                if (t < 0) t += 1;
-                if (t > 1) t -= 1;
-                if (t < 1 / 6) return p + (q - p) * 6 * t;
-                if (t < 1 / 2) return q;
-                if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-                return p;
-            };
-
-            const q = _l < 0.5 ? _l * (1 + _s) : _l + _s - _l * _s;
-            const p = 2 * _l - q;
-            r = hue2rgb(p, q, _h + 1 / 3);
-            g = hue2rgb(p, q, _h);
-            b = hue2rgb(p, q, _h - 1 / 3);
-        }
-
-        const toHex = (x: number): string => {
-            const hex = Math.round(x * 255).toString(16);
-            return hex.length === 1 ? '0' + hex : hex;
-        };
-
-        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-    }
 
     /**
      * Convert an RGB color to an HSL color object.
@@ -184,18 +146,10 @@ export class ColorUtils {
     public static generateComplementaryColor(hex: string): string {
         const color = chroma(hex);
 
-        if (chroma(hex).luminance() === 1) {
-            // Special handling for white
-            return '#000000'; // Complementary of white can be black in some systems
-        }
+        if (chroma(hex).luminance() === 1) return '#000000';
+        if (chroma(hex).luminance() === 0) return '#ffffff';
 
-        if (chroma(hex).luminance() === 0) {
-            // Special handling for black
-            return '#ffffff'; // Complementary of black can be white in some systems
-        }
-
-        const complementaryColor = color.set('hsl.h', (color.get('hsl.h') + 180) % 360);
-        return complementaryColor.hex();
+        return color.set('hsl.h', (color.get('hsl.h') + 180) % 360).hex();
     }
 
     /**
@@ -204,28 +158,13 @@ export class ColorUtils {
      * @returns {string[]} An array of triadic HEX color strings.
     */
     public static generateTriadicColors(baseColor: string): string[] {
-        // Convert base HEX color to HSL
         const baseHsl = this.hexToHsl(baseColor);
-        const baseHue = baseHsl.h;
-
-        // Calculate triadic hues
         const hues = [
-            baseHue,
-            (baseHue + 120) % 360,
-            (baseHue + 240) % 360
+            baseHsl.h,
+            (baseHsl.h + 120) % 360,
+            (baseHsl.h + 240) % 360
         ];
-
-        // Convert HSL hues to HEX colors
-        const triadicColors = hues.map(hue => {
-            // Adjust hue to be within range 0-360
-            const adjustedHue = (hue + 360) % 360;
-
-            // Convert HSL to HEX using chroma
-            const [r, g, b] = chroma.hsl(adjustedHue, baseHsl.s, baseHsl.l).rgb();
-            return chroma.rgb(r, g, b).hex();
-        });
-
-        return triadicColors;
+        return hues.map(h => this.hslToHex({ h, s: baseHsl.s, l: baseHsl.l }));
     }
 
     /**
@@ -236,21 +175,18 @@ export class ColorUtils {
      * @returns {string[]} An array of hex color strings representing the monochromatic color scheme.
      */
     public static generateMonochromaticColors(hex: string, numColors: number): string[] {
-        if (numColors <= 0) {
-            return [];
-        }
-    
+        if (numColors <= 0) return [];
+        if (numColors === 1) return [hex];
+
         const hsl = this.hexToHsl(hex);
-        const colors = [];
-    
+        const colors: string[] = [];
+
         for (let i = 0; i < numColors; i++) {
-            // Calculate lightness adjustment
-            // The adjustment should interpolate between base lightness and 0
-            const l = Math.max(0, Math.min(1, hsl.l * (1 - (i / (numColors - 1)))));
-    
+            const t = i / (numColors - 1);
+            const l = hsl.l * (1 - t); // decreasing lightness from base to 0
             colors.push(this.hslToHex({ h: hsl.h, s: hsl.s, l }));
         }
-    
+
         return colors;
     }
 
@@ -275,9 +211,7 @@ export class ColorUtils {
                 return diff(labColor, distinctLab) > threshold;
             });
 
-            if (isDistinct) {
-                distinctColors.push(hexColors[i]);
-            }
+            if (isDistinct) distinctColors.push(hexColors[i]);
         }
 
         return distinctColors;
@@ -291,12 +225,7 @@ export class ColorUtils {
      */
     public static generateShades(hex: string, numShades: number): string[] {
         if (numShades <= 0) return [];
-
-        const color = chroma(hex);
-        // Create a scale from the original color to black
-        const scale = chroma.scale([color, '#000000']).mode('lab').colors(numShades);
-
-        return scale;
+        return chroma.scale([hex, '#000000']).mode('lab').colors(numShades);
     }
 
     /**
@@ -307,12 +236,7 @@ export class ColorUtils {
      */
     public static generateTints(hex: string, numTints: number): string[] {
         if (numTints <= 0) return [];
-
-        const color = chroma(hex);
-        // Create a scale from the original color to white
-        const scale = chroma.scale([color, '#ffffff']).mode('lab').colors(numTints);
-
-        return scale;
+        return chroma.scale([hex, '#ffffff']).mode('lab').colors(numTints);
     }
 
     /**
@@ -320,13 +244,11 @@ export class ColorUtils {
     * @param {string} color1 - The first hex color string.
     * @param {string} color2 - The second hex color string.
     * @param {number} ratio - The ratio of blending (0 to 1). 0 means full color1, 1 means full color2.
-    * @param {InterpolationMode} [colorSpace='lab'] - The color space to use for blending (default is 'lab').
+    * @param {chroma.InterpolationMode} [colorSpace='lab'] - The color space to use for blending (default is 'lab').
     * @returns {string} The blended hex color string.
     */
-    public static blendColors(color1: string, color2: string, ratio: number, colorSpace: InterpolationMode = 'lab'): string {
-        // Ensure ratio is between 0 and 1
+    public static blendColors(color1: string, color2: string, ratio: number, colorSpace: chroma.InterpolationMode = 'lab'): string {
         ratio = Math.max(0, Math.min(1, ratio));
-        // Use chroma to blend the two colors in the specified color space
         return chroma.mix(color1, color2, ratio, colorSpace).hex();
     }
 
@@ -338,10 +260,20 @@ export class ColorUtils {
     public static hexToHsl(hex: string): HSLColor {
         const [h, s, l] = chroma(hex).hsl();
         return {
-            h: isNaN(h) ? 0 : h,  // Handle NaN hue by setting it to 0
-            s: s,
-            l: l
+            h: isNaN(h) ? 0 : h,     // hue 0-360
+            s: s,                     // 0-1
+            l: l                      // 0-1
         };
+    }
+
+    /**
+    * Convert an HSL color to a hex color string.
+    * @param {HSLColor} hsl - The HSL color object.
+    * @returns {string} The hex color string.
+    */
+    public static hslToHex(hsl: HSLColor): string {
+        // h in 0-360, s/l in 0-1
+        return chroma.hsl(hsl.h, hsl.s, hsl.l).hex();
     }
 
     /**
@@ -369,7 +301,7 @@ export class ColorUtils {
      * @returns {string[]} The array of hex color strings representing the analogous colors.
      */
     public static generateAnalogousColors(hex: string, numColors: number): string[] {
-        const angle = 30; // Angle difference for analogous colors
+        const angle = 30;
         const baseHue = chroma(hex).get('hsl.h');
         const analogousColors = [];
 
@@ -380,7 +312,6 @@ export class ColorUtils {
             analogousColors.push(color1, color2);
         }
 
-        // Slice the array to the required number of colors
         return analogousColors.slice(0, numColors);
     }
 }

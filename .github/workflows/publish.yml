@@ -3,7 +3,7 @@ name: Release & Publish
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   release:
@@ -26,28 +26,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
-      - name: Setup .npmrc file to publish to npm
+      - name: Setup Node.js
         uses: actions/setup-node@v4.0.1
         with:
-          node-version: '18.x'
-          cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "22.x"
+          cache: "yarn"
       - name: Install modules
-        run: npm install
+        run: yarn install --frozen-lockfile
       - name: Build
-        run: npm run build
+        run: yarn build
       - name: Publish to npm
-        run: npm publish --access public
+        run: yarn npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Setup .npmrc file to publish to GitHub Packages
+      - name: Setup GitHub Packages
         uses: actions/setup-node@v4.0.1
         with:
-          node-version: '18.x'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@aminekun90'
-      - run: npm run addscope
-      - name: Publish to GitHub Packages
-        run: npm publish
+          node-version: "22.x"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@aminekun90"
+      - run: yarn npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
