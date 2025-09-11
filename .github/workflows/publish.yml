@@ -11,40 +11,49 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.1
-      - name: Create Release
-        id: create_release
-        uses: comnoco/create-release-action@v2.0.5
+
+      - name: Create Release if it does not exist
+        run: |
+          if ! gh release view ${{ github.ref }} > /dev/null 2>&1; then
+            gh release create ${{ github.ref }} --title "${{ github.ref }}" --notes "Automated release" 
+          else
+            echo "Release already exists, skipping."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: false
-          prerelease: false
 
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1
+
       - name: Setup Node.js
         uses: actions/setup-node@v4.0.1
         with:
           node-version: "22.x"
           cache: "yarn"
-      - name: Install modules
+
+      - name: Install dependencies
         run: yarn install --frozen-lockfile
+
       - name: Build
         run: yarn build
+
+      # Publish to npm registry
       - name: Publish to npm
-        run: yarn npm publish --access public
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Publish to GitHub Packages
       - name: Setup GitHub Packages
         uses: actions/setup-node@v4.0.1
         with:
           node-version: "22.x"
           registry-url: "https://npm.pkg.github.com"
           scope: "@aminekun90"
-      - run: yarn npm publish
+
+      - name: Publish to GitHub Packages
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
