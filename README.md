@@ -10,18 +10,22 @@ A TypeScript library for working with colors, providing functionality to find di
 
 Unleash the full potential of color manipulation with the ColorUtils library! Designed for developers who need precise control over color processing, this TypeScript library provides powerful tools to efficiently find and manipulate distinct colors from any color palette. Whether you're working on data visualization, graphic design, or user interface development, ColorUtils ensures your colors are perfectly balanced and aesthetically pleasing.
 
-## Key Features:
+## Key Features
+
 - Precision Color Conversion: Seamlessly convert between HEX and LAB color spaces to ensure accurate color representation and manipulation.
 - Distinct Color Extraction: Effortlessly extract a specified number of distinct colors from any list, using customizable similarity thresholds to ensure the perfect balance.
 - Performance Optimization: Optimized for both memory and time efficiency, making it suitable for handling large datasets with millions of colors.
 - TypeScript Support: Fully typed for enhanced developer experience and robust error checking.
+
 ## Why Choose ColorUtils?
+
 - High Efficiency: Designed to handle massive color datasets with ease, providing rapid results even with millions of colors.
 - Customizability: Fine-tune color similarity thresholds to match your specific needs and achieve the perfect color harmony.
 - Reliability: Built with rigorous testing and performance benchmarks to ensure consistent and reliable results.
 - Ease of Use: Intuitive API design, comprehensive documentation, and seamless integration into any TypeScript project.
 - Elevate your projects with the precision and performance of the ColorUtils library, your ultimate tool for advanced color processing and manipulation.
-- 
+-
+
 ## Installation
 
 Install the library using npm:
@@ -29,13 +33,15 @@ Install the library using npm:
 ```sh
 npm install advanced-color-utils
 ```
+
 ## Usage
+
 ### Importing the Library
 
 You can import the ColorUtils class from the library as follows:
 
  ```typescript
- import { ColorUtils } from '@color-utils/ColorUtils';
+import ColorUtils from "advanced-color-utils";
  ```
 
 ### Methods
@@ -66,6 +72,7 @@ const threshold = 20;
 const distinctColors = ColorUtils.getDistinctColors(colors, numColorsToRetrieve, threshold);
 console.log(distinctColors); // Output: ['#ff0000', '#00ff00']
 ```
+
 `labToHex`
 
 Converts a LAB color to a hex color string.
@@ -238,7 +245,7 @@ Blends two hex colors together.
 
 `ratio` (number): The ratio of blending (0 to 1). 0 means full color1, 1 means full color2.
 
-`colorSpace` (InterpolationMode): The color space to use for blending (default is 'lab'). 
+`colorSpace` (InterpolationMode): The color space to use for blending (default is 'lab').
 
 Possible values for `colorSpace` are `"rgb" | "hsl" | "hsv" | "hsi" | "lab" | "oklab" | "lch" | "oklch" | "hcl" | "lrgb"`
 
@@ -247,6 +254,7 @@ Possible values for `colorSpace` are `"rgb" | "hsl" | "hsv" | "hsi" | "lab" | "o
 (string) The blended hex color string.
 
 Example:
+
 ```typescript
 const blendedColor = ColorUtils.blendColors('#ff0000', '#0000ff', 0.5, 'lab');
 console.log(blendedColor); // Output: '#b400b4'
@@ -260,7 +268,7 @@ Converts a hex color string to an HSL object.
 
 `hex` (string): The hex color string (e.g., '#ff0000').
 
-**- Returns:** 
+**- Returns:**
 
 (HSLColor) The HSL color object.
 
@@ -293,11 +301,12 @@ const ratio = ColorUtils.getContrastRatio('#ff0000', '#0000ff');
 console.log(ratio); // Output: 4.5
 
 ```
+
 `generateRandomColor`
 
 Generates a random hex color.
 
-**- Returns:** 
+**- Returns:**
 (string) The random hex color string.
 
 **- Example:**
@@ -334,6 +343,6 @@ This library is licensed under the [MIT License](https://github.com/aminekun90/a
 
 Feel free to contribute or report issues via the [GitHub repository](https://github.com/aminekun90/advanced-color-utils).
 
-
 ## Support me :coffee:
+
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/aminebouzahar)

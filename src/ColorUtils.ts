@@ -315,3 +315,5 @@ export class ColorUtils {
         return analogousColors.slice(0, numColors);
     }
 }
+
+export default ColorUtils;
