@@ -168,7 +168,7 @@ numColors (number): The number of colors in the palette.
 **- Example:**
 
 ```typescript
-const palette = ColorUtils.generateColorPalette('#ff0000', 5);
+const palette = ColorUtils.generateComplementaryPalette('#ff0000', 5);
 console.log(palette); // Output: ['#ff0000', '#ff3333', '#ff6666', '#ff9999', '#ffcccc']
 ```
 
