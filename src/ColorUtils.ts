@@ -260,7 +260,7 @@ export class ColorUtils {
     public static hexToHsl(hex: string): HSLColor {
         const [h, s, l] = chroma(hex).hsl();
         return {
-            h: isNaN(h) ? 0 : h,     // hue 0-360
+            h: Number.isNaN(h) ? 0 : h,     // hue 0-360
             s: s,                     // 0-1
             l: l                      // 0-1
         };

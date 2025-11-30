@@ -50,6 +50,12 @@ describe("ColorUtils", () => {
             const end = performance.now();
 
             console.log(`getDistinctColors took ${(end - start).toFixed(2)} ms to execute.`);
+            /**
+             * Example Output:
+             * getDistinctColors took 111.67 ms to execute.
+             * Retrieved 3 distinct colors.
+             * '#4430de', '#2ee424', '#3a8392' 
+             */
             console.log(`Retrieved ${distinctColors.length} distinct colors.`);
             console.log(distinctColors)
             expect(distinctColors).toBeInstanceOf(Array);
@@ -66,7 +72,9 @@ describe("ColorUtils", () => {
         it('should generate a color palette', () => {
             const palette = ColorUtils.generateComplementaryPalette('#ff0000', 5);
             expect(palette.length).toBe(5);
-            palette.forEach(color => expect(color).toMatch(/^#[0-9a-fA-F]{6}$/));
+            for (const color of palette) {
+                expect(color).toMatch(/^#[0-9a-fA-F]{6}$/);
+            }
         });
 
         it('should convert RGB to Hex', () => {
@@ -87,7 +95,9 @@ describe("ColorUtils", () => {
             const threshold = 20;
             const distinctColors = ColorUtils.getDistinctColors(colors, numColorsToRetrieve, threshold);
             expect(distinctColors.length).toBe(2);
-            distinctColors.forEach(color => expect(color).toMatch(/^#[0-9a-fA-F]{6}$/));
+            for (const color of distinctColors) {
+                expect(color).toMatch(/^#[0-9a-fA-F]{6}$/);
+            }
         });
 
         // Unit tests for hexToRgb
@@ -392,11 +402,13 @@ describe("ColorUtils", () => {
                 '#00ff00', // +120° HSL
                 '#0000ff'  // +240° HSL
             ];
-
-            triadic.forEach((c, i) => {
+            let i = 0;
+            for (const c of triadic) {
                 expect(chroma.valid(c)).toBe(true);
-                expect(chroma.distance(c, expected[i])).toBeLessThan(2); // small visual difference tolerance
-            });
+                expect(chroma.distance(c, expected[i])).toBeLessThan(2);
+                i++;
+            }
+
         });
     });
 
