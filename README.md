@@ -26,12 +26,20 @@ Unleash the full potential of color manipulation with the ColorUtils library! De
 - Elevate your projects with the precision and performance of the ColorUtils library, your ultimate tool for advanced color processing and manipulation.
 -
 
+## Requirements
+
+- Node.js 22+
+- OS (Windows, Linux, macOS)
+- Not tested on Docker containers but should work fine (no network usage).
+
 ## Installation
 
 Install the library using npm:
 
 ```sh
 npm install advanced-color-utils
+# or prefered way
+yarn add advanced-color-utils
 ```
 
 ## Usage
