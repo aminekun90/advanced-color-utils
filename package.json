@@ -1,6 +1,6 @@
 {
   "name": "advanced-color-utils",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Unleash the full potential of color manipulation with the ColorUtils library! Designed for developers who need precise control over color processing.",
   "main": "dist/ColorUtils.js",
   "types": "dist/ColorUtils.d.ts",
@@ -18,9 +18,12 @@
   },
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
-    "test": "jest --no-cache --runInBand",
-    "test:cov": "jest --coverage --no-cache --runInBand",
-    "build": "tsc"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:ui": "vitest --ui",
+    "build": "tsc",
+    "pack": "npm pack"
   },
   "author": "aminekun90",
   "license": "MIT",
@@ -36,15 +39,15 @@
   "devDependencies": {
     "@types/chroma-js": "^3.1.2",
     "@types/color-diff": "^1.2.5",
-    "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
-    "jest": "^30.2.0",
+    "@vitest/coverage-v8": "^4.0.15",
     "prettier": "^3.7.3",
-    "ts-jest": "^29.4.5",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^4.0.15"
   },
   "publishConfig": {
     "access": "public"

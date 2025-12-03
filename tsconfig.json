@@ -5,19 +5,27 @@
     "experimentalDecorators": true,
     "module": "commonjs",
     "outDir": "./dist",
-    "lib": ["es2022"],
+    "lib": [
+      "es2022"
+    ],
     "declaration": true,
     "sourceMap": true,
     "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true, 
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@color-utils/*": ["src/*"] // Not working on build package need a webpack or similar to do alias resolution     
+      "@/*": [
+        "src/*"
+      ] // Not working on build package need a webpack or similar to do alias resolution     
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "src/**/__tests__/*"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+  ]
 }
