@@ -6,14 +6,9 @@
   "types": "dist/ColorUtils.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/ColorUtils.js",
       "require": "./dist/ColorUtils.js",
-      "types": "./dist/ColorUtils.d.ts"
-    },
-    "./*": {
-      "import": "./dist/*.js",
-      "require": "./dist/*.js",
-      "types": "./dist/*.d.ts"
+      "types": "./dist/ColorUtils.d.ts",
+      "import": "./dist/ColorUtils.js"
     }
   },
   "scripts": {
