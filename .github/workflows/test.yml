@@ -7,37 +7,71 @@ on:
       - "README.md"
       - "LICENSE"
       - ".editorconfig"
-    branches:
-      - main
-      - master
+    branches: [main, master]
   pull_request:
     paths-ignore:
       - "docs/**"
       - "README.md"
       - "LICENSE"
       - ".editorconfig"
-    branches:
-      - main
-      - master
+    branches: [main, master]
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-        node: [22.x]
+        os: [ubuntu-latest, windows-latest]
+        node: [22.x, 24.x, 25.x]
 
     steps:
-      - uses: actions/checkout@v4.1.1
-      - name: Set up Node.js
-        uses: actions/setup-node@v4.0.1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-          cache: "yarn" # Adds Yarn caching
-      - name: Install modules
+          cache: "yarn"
+
+      - name: Install dependencies
+        shell: bash
         run: yarn install --frozen-lockfile
+
+      - name: Build package
+        shell: bash
+        run: yarn build
+
       - name: Run tests
+        shell: bash
         run: yarn test
+
+      - name: Test coverage (optional)
+        shell: bash
+        if: success()
+        run: yarn test:cov
+
+      # --------------------------------------------------------------------
+      # SECURITY AUDIT (LINUX ONLY)
+      # --------------------------------------------------------------------
+      - name: Set permissions on audit script
+        if: matrix.os == 'ubuntu-latest'
+        run: chmod +x ./shai-hulud-audit.sh
+
+      - name: Shai-Hulud Audit Security
+        if: matrix.os == 'ubuntu-latest' && success()
+        shell: bash
+        run: |
+          ./shai-hulud-audit.sh --no-color --save-report
+        continue-on-error: true # 🚨 DO NOT FAIL THE PIPELINE
+
+      - name: Upload security audit report
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-report-${{ matrix.os }}-node${{ matrix.node }}-${{ github.run_number }}
+          path: "*.log"
+          retention-days: 7
