@@ -4,50 +4,126 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  issues: write
+  id-token: write
 
 jobs:
-  release:
+  # JOB 1: Create the Release and Tag
+  create-release:
+    name: Create GitHub Release
     runs-on: ubuntu-latest
+    outputs:
+      target_tag: ${{ steps.get_tag.outputs.TARGET_TAG }}
+      release_created: ${{ steps.create_release.outputs.release_created }}
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.1.1
-      - name: Create Release
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          cache: "yarn"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Determine Release Version
+        id: get_tag
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            TAG_NAME=${{ github.ref_name }}
+            echo "TARGET_TAG=$TAG_NAME" >> $GITHUB_OUTPUT
+          else
+            VERSION=$(node -p "require('./package.json').version")
+            TAG_NAME="v$VERSION"
+            echo "TARGET_TAG=$TAG_NAME" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install & Build
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+
+      - name: Create GitHub Release
         id: create_release
-        uses: comnoco/create-release-action@v2.0.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: false
-          prerelease: false
+          TAG: ${{ steps.get_tag.outputs.TARGET_TAG }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "release_created=true" >> $GITHUB_OUTPUT
+          else
+            gh release create "$TAG" --title "$TAG" --generate-notes --target ${{ github.sha }}
+            echo "release_created=true" >> $GITHUB_OUTPUT
+          fi
 
-  publish:
+  # JOB 2: Security Audit + Publish
+  publish-npm:
+    name: Audit & Publish
+    needs: create-release
     runs-on: ubuntu-latest
+    if: needs.create-release.outputs.release_created == 'true'
+    environment:
+      name: npm-publish
+      url: https://github.com/${{ github.repository }}/releases/tag/${{ needs.create-release.outputs.target_tag }}
+
     steps:
-      - uses: actions/checkout@v4.1.1
-      - name: Setup .npmrc file to publish to npm
-        uses: actions/setup-node@v4.0.1
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          node-version: "18.x"
-          cache: "npm"
+          ref: ${{ needs.create-release.outputs.target_tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+          cache: "yarn"
           registry-url: "https://registry.npmjs.org"
-      - name: Install modules
-        run: yarn install --frozen-lockfile
-      - name: Build
-        run: yarn build
-      - name: Publish to npm
-        run: npm publish --access public
+
+      - name: Install & Build
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+
+      # -----------------------------
+      #  Run Shai-Hulud Security Audit
+      # -----------------------------
+      - name: Run Shai-Hulud Audit
+        shell: bash
+        run: |
+          chmod +x ./shai-hulud-audit.sh
+          ./shai-hulud-audit.sh --no-color --save-report || true
+
+      - name: Upload Audit Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: shai-hulud-audit-${{ github.run_number }}
+          path: "*.log"
+          retention-days: 7
+
+      # -----------------------------
+      #  Publish to public NPM
+      # -----------------------------
+      - name: Publish to NPM
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Setup .npmrc file to publish to GitHub Packages
-        uses: actions/setup-node@v4.0.1
-        with:
-          node-version: "18.x"
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@aminekun90"
-      - run: npm run addscope
+        run: npm publish --access public
+
+      # -----------------------------
+      #  Publish to GitHub Packages
+      # -----------------------------
       - name: Publish to GitHub Packages
-        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm pkg set name="@aminekun90/advanced-color-utils"
+          npm config set @aminekun90:registry=https://npm.pkg.github.com/
+          npm config set //npm.pkg.github.com/:_authToken="${NODE_AUTH_TOKEN}"
+          npm publish

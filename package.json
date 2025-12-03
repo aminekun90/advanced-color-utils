@@ -28,8 +28,8 @@
   "author": "aminekun90",
   "license": "MIT",
   "engines": {
-    "npm": ">=9.8.1",
-    "node": ">=18.18.2"
+    "npm": ">=10.9.4",
+    "node": ">=22.21.1"
   },
   "dependencies": {
     "chroma-js": "^3.2.0",
