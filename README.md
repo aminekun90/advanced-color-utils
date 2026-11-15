@@ -48,9 +48,19 @@ yarn add advanced-color-utils
 
 You can import the ColorUtils class from the library as follows:
 
- ```typescript
+```typescript
 import ColorUtils from "advanced-color-utils";
- ```
+// or
+import { ColorUtils } from "advanced-color-utils";
+// CommonJS
+const { ColorUtils } = require("advanced-color-utils");
+```
+
+Option and color types are exported too:
+
+```typescript
+import type { HSLColor, ContrastOptions, SortColorsOptions } from "advanced-color-utils";
+```
 
 ### Methods
 
@@ -343,6 +353,78 @@ Parameters:
 ```typescript
 const analogousColors = ColorUtils.generateAnalogousColors('#ff0000', 5);
 console.log(analogousColors); // Output: ['#ff0000', '#ff3333', '#ff6666', '#ff9999', '#ffcccc']
+```
+
+### Accessibility
+
+`meetsWcagContrast(foreground, background, options?)`
+
+Checks a text/background pair against the WCAG 2.x thresholds: AA is 4.5:1 (3:1 for large text), AAA is 7:1 (4.5:1 for large text).
+
+`options`: `{ level?: "AA" | "AAA", largeText?: boolean }` (defaults: `"AA"`, `false`).
+
+```typescript
+ColorUtils.meetsWcagContrast('#767676', '#ffffff');                     // true  (4.54:1)
+ColorUtils.meetsWcagContrast('#767676', '#ffffff', { level: 'AAA' });   // false
+ColorUtils.meetsWcagContrast('#949494', '#ffffff', { largeText: true }); // true
+```
+
+`getReadableTextColor(background, options?)`
+
+Returns the candidate with the highest contrast against `background`. Default candidates are black and white; on a tie the first candidate wins. Throws a `RangeError` on an empty list.
+
+```typescript
+ColorUtils.getReadableTextColor('#1a1a2e');                                       // '#ffffff'
+ColorUtils.getReadableTextColor('#000000', { candidates: ['#333333', '#ffcc00'] }); // '#ffcc00'
+```
+
+### Manipulation
+
+`lighten(hex, amount = 1)` / `darken(hex, amount = 1)`: shift LAB lightness (about 18 points per unit).
+
+`saturate(hex, amount = 1)` / `desaturate(hex, amount = 1)`: shift LCH chroma (about 18 points per unit).
+
+```typescript
+ColorUtils.darken('#3366cc', 2);
+ColorUtils.desaturate('#ff0000');
+```
+
+### Harmonies
+
+`generateSplitComplementaryColors(hex)`: base, +150° and +210° → 3 colors.
+
+`generateTetradicColors(hex)`: four hues 90° apart → 4 colors.
+
+```typescript
+ColorUtils.generateTetradicColors('#ff0000'); // ['#ff0000', '#80ff00', '#00ffff', '#7f00ff']
+```
+
+### Scales, sorting and comparison
+
+`generateColorScale(colors, { steps, mode? })`: interpolates through two or more anchor colors (`mode` defaults to `'lab'`).
+
+```typescript
+ColorUtils.generateColorScale(['#ffffcc', '#41b6c4', '#0c2c84'], { steps: 7 });
+```
+
+`sortColors(hexColors, { by, order? })`: returns a new array sorted by `'hue'`, `'saturation'`, `'lightness'` or `'luminance'` (`order` defaults to `'asc'`). The input is not mutated.
+
+```typescript
+ColorUtils.sortColors(['#0000ff', '#ff0000', '#00ff00'], { by: 'hue' }); // ['#ff0000', '#00ff00', '#0000ff']
+```
+
+`getColorDifference(color1, color2)`: CIEDE2000 delta E. Below ~2.3 the difference is barely noticeable.
+
+```typescript
+ColorUtils.getColorDifference('#ff0000', '#ff0a00'); // small
+ColorUtils.getColorDifference('#ff0000', '#0000ff'); // large
+```
+
+`isValidHex(value)`: `true` for `#rgb`, `#rgba`, `#rrggbb` and `#rrggbbaa`. Use it to validate user input before calling the other methods.
+
+```typescript
+ColorUtils.isValidHex('#ff0000'); // true
+ColorUtils.isValidHex('red');     // false
 ```
 
 ## License
