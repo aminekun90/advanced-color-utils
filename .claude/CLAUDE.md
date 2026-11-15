@@ -25,7 +25,7 @@ Current version: **1.0.10**. `engines`: node `>=22.21.1`, npm `>=10.9.4`. `.nvmr
 | `src/helper/generateColor.ts` | Palette generation internals |
 | `src/decorators/LogPerf.ts` | `@LogPerf` timing decorator, logs through tslog |
 | `src/types.ts` | Shared types |
-| `src/__tests__/ColorUtils.test.ts` | The whole suite (21 tests) |
+| `src/__tests__/ColorUtils.test.ts` | The whole suite (54 tests) |
 | `tools/packagejson.js` | Mutates `package.json` from CLI arg pairs — used by CI |
 | `tools/cleanup.js` | Recursive delete, hard-restricted to `dist/` |
 | `shai-hulud-audit.sh` | Supply-chain audit script, also runs on CI runners |
@@ -40,7 +40,7 @@ reproduce a CI failure; `npm run <script>` is fine for running things.
 
 **`npm test` output is drowned in logs.** The `@LogPerf` decorator emits a tslog INFO line
 for every call, so the middle of the output is noise. Read only the last block:
-`Test Files N passed` / `Tests N passed`. As of this writing: **21 tests, 1 file, green.**
+`Test Files N passed` / `Tests N passed`. As of this writing: **54 tests, 1 file, green.**
 
 **Publishing is tag-driven, never manual.** Pushing a `v*` tag runs `publish.yml`, which
 creates the GitHub release, builds, publishes to npmjs with `--provenance`, then publishes
@@ -61,11 +61,12 @@ hand-edit `dist/` — `npm run build` overwrites it.
 
 ## Commands (all verified)
 ```bash
-npm test              # vitest run — 21 tests, ~130 ms
+npm test              # vitest run — 54 tests, ~130 ms
 npm run test:cov      # + v8 coverage (text/json/html)
 npm run test:watch    # watch mode
 npm run test:ui       # vitest UI
-npm run build         # tsc → dist/  (silent on success, exit 0)
+npm run build         # tsc → dist/, then tools/esm-entry.js writes the ESM entry
+npm run test:dist     # loads the built package via its exports map (CJS + ESM)
 npm run pack          # npm pack, produces a .tgz (gitignored)
 npm start             # ts-node runner on src/index.ts
 
