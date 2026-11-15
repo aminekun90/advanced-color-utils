@@ -9,7 +9,7 @@ generation, blending and color-diff. Public, MIT-adjacent OSS, 1★.
   `--provenance` via OIDC)
 - GitHub Packages as the `@aminekun90` scope — this is what `.npmrc` points at locally
 
-Current version: **1.0.10**. `engines`: node `>=22.21.1`, npm `>=10.9.4`. `.nvmrc` is
+Current version: **1.1.0**. `engines`: node `>=22.21.1`, npm `>=10.9.4`. `.nvmrc` is
 `lts/jod` (Node 22), but the suite builds and passes on Node 24 too.
 
 ## Tech Stack
