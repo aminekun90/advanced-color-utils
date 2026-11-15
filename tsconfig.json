@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2022",
+    "target": "es2023",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "module": "commonjs",
@@ -10,7 +10,7 @@
       "vitest/globals"
     ],
     "lib": [
-      "es2022"
+      "es2023"
     ],
     "declaration": true,
     "sourceMap": true,
