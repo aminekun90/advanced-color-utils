@@ -14,5 +14,5 @@ fs.writeFileSync(
 )
 fs.writeFileSync(
   Path.join(dist, 'ColorUtils.d.mts'),
-  'import { ColorUtils } from "./ColorUtils.js";\n\nexport { ColorUtils };\nexport default ColorUtils;\n'
+  'import { ColorUtils } from "./ColorUtils.js";\n\nexport * from "./ColorUtils.js";\nexport default ColorUtils;\n'
 )

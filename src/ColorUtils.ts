@@ -1,7 +1,17 @@
 import { LogPerf } from "./decorators/LogPerf";
-import { HSLColor } from "./types";
+import type { ColorScaleOptions, ContrastOptions, HSLColor, ReadableTextOptions, SortColorsOptions } from "./types";
 import chroma from "chroma-js";
 import { diff, LabColor, RGBColor } from "color-diff";
+
+export type { ColorScaleOptions, ColorSortKey, ContrastOptions, HSLColor, ReadableTextOptions, SortColorsOptions, WcagLevel } from "./types";
+
+const HEX_PATTERN = /^#([\da-f]{3}|[\da-f]{4}|[\da-f]{6}|[\da-f]{8})$/i;
+
+// WCAG 2.x minimum contrast ratios (success criteria 1.4.3 and 1.4.6).
+const WCAG_MIN_CONTRAST = {
+    AA: { normal: 4.5, large: 3 },
+    AAA: { normal: 7, large: 4.5 },
+} as const;
 
 export class ColorUtils {
 
@@ -60,7 +70,7 @@ export class ColorUtils {
      * @param {string} hex - The hex color string (e.g., "#ff0000").
      * @returns {LabColor} The LAB color object.
      */
-    private static hexToLab(hex: string): LabColor {
+    public static hexToLab(hex: string): LabColor {
         const [L, a, b] = chroma(hex).lab();
         return { L, a, b };
     }
@@ -158,13 +168,7 @@ export class ColorUtils {
      * @returns {string[]} An array of triadic HEX color strings.
     */
     public static generateTriadicColors(baseColor: string): string[] {
-        const baseHsl = this.hexToHsl(baseColor);
-        const hues = [
-            baseHsl.h,
-            (baseHsl.h + 120) % 360,
-            (baseHsl.h + 240) % 360
-        ];
-        return hues.map(h => this.hslToHex({ h, s: baseHsl.s, l: baseHsl.l }));
+        return this.rotateHues(baseColor, [0, 120, 240]);
     }
 
     /**
@@ -313,6 +317,149 @@ export class ColorUtils {
         }
 
         return analogousColors.slice(0, numColors);
+    }
+
+    /**
+     * Check whether a string is a CSS hex color (#rgb, #rgba, #rrggbb or #rrggbbaa).
+     * @param {string} value - The string to check.
+     * @returns {boolean} True when the value is a valid hex color.
+     */
+    public static isValidHex(value: string): boolean {
+        return HEX_PATTERN.test(value);
+    }
+
+    /**
+     * Lighten a color in LAB space.
+     * @param {string} hex - The hex color string.
+     * @param {number} [amount=1] - Strength; each unit is about 18 points of LAB lightness.
+     * @returns {string} The lightened hex color string.
+     */
+    public static lighten(hex: string, amount = 1): string {
+        return chroma(hex).brighten(amount).hex();
+    }
+
+    /**
+     * Darken a color in LAB space.
+     * @param {string} hex - The hex color string.
+     * @param {number} [amount=1] - Strength; each unit is about 18 points of LAB lightness.
+     * @returns {string} The darkened hex color string.
+     */
+    public static darken(hex: string, amount = 1): string {
+        return chroma(hex).darken(amount).hex();
+    }
+
+    /**
+     * Increase the saturation of a color in LCH space.
+     * @param {string} hex - The hex color string.
+     * @param {number} [amount=1] - Strength; each unit is about 18 points of LCH chroma.
+     * @returns {string} The saturated hex color string.
+     */
+    public static saturate(hex: string, amount = 1): string {
+        return chroma(hex).saturate(amount).hex();
+    }
+
+    /**
+     * Decrease the saturation of a color in LCH space.
+     * @param {string} hex - The hex color string.
+     * @param {number} [amount=1] - Strength; each unit is about 18 points of LCH chroma.
+     * @returns {string} The desaturated hex color string.
+     */
+    public static desaturate(hex: string, amount = 1): string {
+        return chroma(hex).desaturate(amount).hex();
+    }
+
+    /**
+     * Perceptual distance between two colors (CIEDE2000). Below ~2.3 the difference is barely noticeable.
+     * @param {string} color1 - The first hex color string.
+     * @param {string} color2 - The second hex color string.
+     * @returns {number} The CIEDE2000 delta E.
+     */
+    public static getColorDifference(color1: string, color2: string): number {
+        return diff(this.hexToLab(color1), this.hexToLab(color2));
+    }
+
+    /**
+     * Check a foreground/background pair against the WCAG 2.x contrast thresholds.
+     * @param {string} foreground - The text hex color string.
+     * @param {string} background - The background hex color string.
+     * @param {ContrastOptions} [options] - Conformance level ("AA" by default) and text size.
+     * @returns {boolean} True when the pair meets the requested level.
+     */
+    public static meetsWcagContrast(foreground: string, background: string, options: ContrastOptions = {}): boolean {
+        const { level = "AA", largeText = false } = options;
+        const threshold = WCAG_MIN_CONTRAST[level][largeText ? "large" : "normal"];
+        return this.getContrastRatio(foreground, background) >= threshold;
+    }
+
+    /**
+     * Pick the most readable text color for a background.
+     * @param {string} background - The background hex color string.
+     * @param {ReadableTextOptions} [options] - Candidate colors, black and white by default.
+     * @returns {string} The candidate with the highest contrast ratio; the first one wins ties.
+     */
+    public static getReadableTextColor(background: string, options: ReadableTextOptions = {}): string {
+        const { candidates = ["#000000", "#ffffff"] } = options;
+        if (candidates.length === 0) throw new RangeError("getReadableTextColor needs at least one candidate color");
+
+        return candidates.reduce((best, candidate) =>
+            this.getContrastRatio(candidate, background) > this.getContrastRatio(best, background) ? candidate : best
+        );
+    }
+
+    /**
+     * Generate a split-complementary scheme: the base color and the two neighbours of its complement.
+     * @param {string} hex - The base hex color string.
+     * @returns {string[]} Three hex color strings, base first.
+     */
+    public static generateSplitComplementaryColors(hex: string): string[] {
+        return this.rotateHues(hex, [0, 150, 210]);
+    }
+
+    /**
+     * Generate a tetradic (square) scheme: four hues 90 degrees apart.
+     * @param {string} hex - The base hex color string.
+     * @returns {string[]} Four hex color strings, base first.
+     */
+    public static generateTetradicColors(hex: string): string[] {
+        return this.rotateHues(hex, [0, 90, 180, 270]);
+    }
+
+    /**
+     * Interpolate an evenly spaced scale through two or more colors.
+     * @param {string[]} colors - The anchor hex color strings, in order.
+     * @param {ColorScaleOptions} options - Number of steps and interpolation mode ("lab" by default).
+     * @returns {string[]} The scale as hex color strings, anchors at both ends.
+     */
+    public static generateColorScale(colors: string[], options: ColorScaleOptions): string[] {
+        const { steps, mode = "lab" } = options;
+        if (steps <= 0) return [];
+        return chroma.scale(colors).mode(mode).colors(steps);
+    }
+
+    /**
+     * Sort colors by a perceptual or HSL property without mutating the input.
+     * @param {string[]} hexColors - The hex color strings to sort.
+     * @param {SortColorsOptions} options - Sort key and order ("asc" by default).
+     * @returns {string[]} A new sorted array.
+     */
+    public static sortColors(hexColors: string[], options: SortColorsOptions): string[] {
+        const { by, order = "asc" } = options;
+        const direction = order === "asc" ? 1 : -1;
+        const keyOf = (hex: string): number => {
+            if (by === "luminance") return chroma(hex).luminance();
+            const hsl = this.hexToHsl(hex);
+            return by === "hue" ? hsl.h : by === "saturation" ? hsl.s : hsl.l;
+        };
+
+        return hexColors
+            .map(hex => ({ hex, key: keyOf(hex) }))
+            .toSorted((a, b) => (a.key - b.key) * direction)
+            .map(({ hex }) => hex);
+    }
+
+    private static rotateHues(hex: string, offsets: number[]): string[] {
+        const base = this.hexToHsl(hex);
+        return offsets.map(offset => this.hslToHex({ ...base, h: (base.h + offset) % 360 }));
     }
 }
 

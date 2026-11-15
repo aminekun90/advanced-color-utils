@@ -196,3 +196,152 @@ describe("ColorUtils", () => {
         });
     });
 });
+describe("ColorUtils — validation and manipulation", () => {
+    describe("isValidHex", () => {
+        it.each(["#fff", "#FFFF", "#ff0000", "#ff000080"])("accepts %s", (value) => {
+            expect(ColorUtils.isValidHex(value)).toBe(true);
+        });
+
+        it.each(["ff0000", "#ff000", "#gg0000", "red", "", "#ff0000 "])("rejects %j", (value) => {
+            expect(ColorUtils.isValidHex(value)).toBe(false);
+        });
+    });
+
+    describe("lighten / darken", () => {
+        it("moves LAB lightness in the requested direction", () => {
+            const baseLightness = ColorUtils.hexToLab("#3366cc").L;
+            expect(ColorUtils.hexToLab(ColorUtils.lighten("#3366cc")).L).toBeGreaterThan(baseLightness);
+            expect(ColorUtils.hexToLab(ColorUtils.darken("#3366cc")).L).toBeLessThan(baseLightness);
+        });
+
+        it("scales with amount", () => {
+            const once = ColorUtils.hexToLab(ColorUtils.darken("#3366cc", 1)).L;
+            const twice = ColorUtils.hexToLab(ColorUtils.darken("#3366cc", 2)).L;
+            expect(twice).toBeLessThan(once);
+        });
+
+        it("returns the same color for amount 0", () => {
+            expect(ColorUtils.lighten("#3366cc", 0)).toBe("#3366cc");
+        });
+    });
+
+    describe("saturate / desaturate", () => {
+        it("moves HSL saturation in the requested direction", () => {
+            const base = ColorUtils.hexToHsl("#996666").s;
+            expect(ColorUtils.hexToHsl(ColorUtils.saturate("#996666")).s).toBeGreaterThan(base);
+            expect(ColorUtils.hexToHsl(ColorUtils.desaturate("#996666")).s).toBeLessThan(base);
+        });
+    });
+
+    describe("hexToLab", () => {
+        it("converts pure white to L=100", () => {
+            expect(ColorUtils.hexToLab("#ffffff").L).toBeCloseTo(100, 1);
+        });
+    });
+
+    describe("getColorDifference", () => {
+        it("is 0 for identical colors", () => {
+            expect(ColorUtils.getColorDifference("#ff0000", "#ff0000")).toBe(0);
+        });
+
+        it("is symmetric and larger for more distant colors", () => {
+            const near = ColorUtils.getColorDifference("#ff0000", "#ff0a00");
+            const far = ColorUtils.getColorDifference("#ff0000", "#0000ff");
+            expect(near).toBeCloseTo(ColorUtils.getColorDifference("#ff0a00", "#ff0000"), 6);
+            expect(far).toBeGreaterThan(near);
+        });
+    });
+});
+
+describe("ColorUtils — accessibility", () => {
+    describe("meetsWcagContrast", () => {
+        // #767676 on white is the classic AA boundary: ~4.54:1.
+        it("passes AA for normal text at 4.5:1", () => {
+            expect(ColorUtils.meetsWcagContrast("#767676", "#ffffff")).toBe(true);
+        });
+
+        it("fails AA for normal text just under 4.5:1", () => {
+            expect(ColorUtils.meetsWcagContrast("#777777", "#ffffff")).toBe(false);
+        });
+
+        it("applies the lower large-text threshold", () => {
+            expect(ColorUtils.meetsWcagContrast("#949494", "#ffffff", { largeText: true })).toBe(true);
+            expect(ColorUtils.meetsWcagContrast("#949494", "#ffffff")).toBe(false);
+        });
+
+        it("applies the stricter AAA threshold", () => {
+            expect(ColorUtils.meetsWcagContrast("#767676", "#ffffff", { level: "AAA" })).toBe(false);
+            expect(ColorUtils.meetsWcagContrast("#000000", "#ffffff", { level: "AAA" })).toBe(true);
+        });
+    });
+
+    describe("getReadableTextColor", () => {
+        it("picks white on dark and black on light backgrounds", () => {
+            expect(ColorUtils.getReadableTextColor("#1a1a2e")).toBe("#ffffff");
+            expect(ColorUtils.getReadableTextColor("#f5f5dc")).toBe("#000000");
+        });
+
+        it("chooses among custom candidates", () => {
+            expect(ColorUtils.getReadableTextColor("#000000", { candidates: ["#333333", "#ffcc00"] })).toBe("#ffcc00");
+        });
+
+        it("throws on an empty candidate list", () => {
+            expect(() => ColorUtils.getReadableTextColor("#000000", { candidates: [] })).toThrow(RangeError);
+        });
+    });
+});
+
+describe("ColorUtils — harmonies, scales and sorting", () => {
+    const hueOf = (hex: string): number => Math.round(ColorUtils.hexToHsl(hex).h);
+
+    it("generateTriadicColors keeps its 120° spacing", () => {
+        expect(ColorUtils.generateTriadicColors("#ff0000").map(hueOf)).toEqual([0, 120, 240]);
+    });
+
+    it("generateSplitComplementaryColors returns base, +150° and +210°", () => {
+        expect(ColorUtils.generateSplitComplementaryColors("#ff0000").map(hueOf)).toEqual([0, 150, 210]);
+    });
+
+    it("generateTetradicColors returns four hues 90° apart", () => {
+        expect(ColorUtils.generateTetradicColors("#ff0000").map(hueOf)).toEqual([0, 90, 180, 270]);
+    });
+
+    describe("generateColorScale", () => {
+        it("returns the requested number of steps with the anchors at both ends", () => {
+            const scale = ColorUtils.generateColorScale(["#ff0000", "#0000ff"], { steps: 5 });
+            expect(scale).toHaveLength(5);
+            expect(scale[0]).toBe("#ff0000");
+            expect(scale.at(-1)).toBe("#0000ff");
+        });
+
+        it("passes through intermediate anchors", () => {
+            const scale = ColorUtils.generateColorScale(["#000000", "#ff0000", "#ffffff"], { steps: 3, mode: "rgb" });
+            expect(scale).toEqual(["#000000", "#ff0000", "#ffffff"]);
+        });
+
+        it("returns an empty array for steps <= 0", () => {
+            expect(ColorUtils.generateColorScale(["#000000", "#ffffff"], { steps: 0 })).toEqual([]);
+        });
+    });
+
+    describe("sortColors", () => {
+        const colors = ["#0000ff", "#ffffff", "#ff0000", "#000000", "#00ff00"];
+
+        it("sorts by hue without mutating the input", () => {
+            const snapshot = [...colors];
+            const sorted = ColorUtils.sortColors(["#0000ff", "#ff0000", "#00ff00"], { by: "hue" });
+            expect(sorted).toEqual(["#ff0000", "#00ff00", "#0000ff"]);
+            expect(colors).toEqual(snapshot);
+        });
+
+        it("sorts by luminance in descending order", () => {
+            expect(ColorUtils.sortColors(colors, { by: "luminance", order: "desc" }))
+                .toEqual(["#ffffff", "#00ff00", "#ff0000", "#0000ff", "#000000"]);
+        });
+
+        it("sorts by lightness", () => {
+            expect(ColorUtils.sortColors(["#ffffff", "#808080", "#000000"], { by: "lightness" }))
+                .toEqual(["#000000", "#808080", "#ffffff"]);
+        });
+    });
+});
