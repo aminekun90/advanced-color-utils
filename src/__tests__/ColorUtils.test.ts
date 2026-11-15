@@ -1,5 +1,5 @@
-import { ColorUtils } from "@/ColorUtils";
-import { generateRandomColor } from "@/helper/generateColor";
+import { ColorUtils } from "../ColorUtils";
+import { generateRandomColor } from "../helper/generateColor";
 import { describe, expect, it } from "vitest";
 
 describe("ColorUtils", () => {

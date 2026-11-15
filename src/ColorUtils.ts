@@ -1,5 +1,5 @@
-import { LogPerf } from "@/decorators/LogPerf";
-import { HSLColor } from "@/types";
+import { LogPerf } from "./decorators/LogPerf";
+import { HSLColor } from "./types";
 import chroma from "chroma-js";
 import { diff, LabColor, RGBColor } from "color-diff";
 

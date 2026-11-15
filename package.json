@@ -6,19 +6,25 @@
   "types": "dist/ColorUtils.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/ColorUtils.js",
-      "types": "./dist/ColorUtils.d.ts",
-      "import": "./dist/ColorUtils.js"
+      "import": {
+        "types": "./dist/ColorUtils.d.mts",
+        "default": "./dist/ColorUtils.mjs"
+      },
+      "require": {
+        "types": "./dist/ColorUtils.d.ts",
+        "default": "./dist/ColorUtils.js"
+      }
     }
   },
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "start": "ts-node src/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:ui": "vitest --ui",
-    "build": "tsc",
-    "pack": "npm pack"
+    "build": "tsc && node tools/esm-entry.js",
+    "pack": "npm pack",
+    "test:dist": "node tools/smoke-dist.mjs"
   },
   "author": "aminekun90",
   "license": "MIT",
@@ -27,21 +33,19 @@
     "node": ">=22.21.1"
   },
   "dependencies": {
+    "@types/chroma-js": "^3.1.2",
+    "@types/color-diff": "^1.2.5",
     "chroma-js": "^3.2.0",
     "color-diff": "^1.4.0",
     "tslog": "^4.10.2"
   },
   "devDependencies": {
-    "@types/chroma-js": "^3.1.2",
-    "@types/color-diff": "^1.2.5",
     "@types/node": "^24.10.1",
     "@vitest/coverage-v8": "^4.0.15",
     "prettier": "^3.7.3",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
-    "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^4.0.15"
   },
   "publishConfig": {

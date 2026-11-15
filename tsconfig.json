@@ -18,13 +18,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ] // Not working on build package need a webpack or similar to do alias resolution     
-    }
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "src/**/*"
