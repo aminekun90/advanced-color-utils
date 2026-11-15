@@ -45,6 +45,10 @@ jobs:
         shell: bash
         run: yarn build
 
+      - name: Smoke test built package
+        shell: bash
+        run: yarn test:dist
+
       - name: Run tests
         shell: bash
         run: yarn test

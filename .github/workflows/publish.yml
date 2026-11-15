@@ -50,6 +50,8 @@ jobs:
         run: |
           yarn install --frozen-lockfile
           yarn build
+          yarn test
+          yarn test:dist
 
       - name: Create GitHub Release
         id: create_release
